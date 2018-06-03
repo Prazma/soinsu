@@ -86,7 +86,7 @@
 	</head>
 	<body>
 		<div id="startport">
-			<h1>素因数高速分解</h1><br>
+			<h1>素因数分解ゲーム</h1><br>
 			<h3>by 数学を数楽にしMATH</h3>
 			<div class="margedTop">
 				<button onclick="startGame()">スタート！</button>
@@ -143,21 +143,13 @@
             var totalPoints = document.getElementById("totalPoints");
             var completePoints = document.getElementById("completePoints");
 
-
-			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-				gameMode = "mobile";
-			} else {
-				gameMode = "normal";
-			}
 			function startGame() {
                 playtimer.innerHTML = "10";
                 playpoints.innerHTML = "0";
 				startport.style.display = "none";
 				playport.style.display = "block";
                 globalEnd = "not";
-				if(gameMode == "normal") {
-					startMobile();
-				}
+				startMobile();
 			}
 			function startMobile() {
 				var targetInt = Math.floor((Math.random() * 999) + 100);
