@@ -3,6 +3,7 @@
 	<head>
 		<title>素因数分解ゲーム</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no">
+        <script src='https://cdn.firebase.com/js/client/2.4.0/firebase.js'></script>
 		<style>
 			body {
 				margin: 0;
@@ -82,6 +83,9 @@
                 margin-right: auto;
                 margin-left: auto;
             }
+            #scoreBoard {
+                text-align: left;
+            }
 		</style>
 	</head>
 	<body>
@@ -94,9 +98,10 @@
 			</div>
             <div class="highscore">
                 <fieldset>
-                    <legend>ハイスコア</legend>
-                    まだこのゲームの創造者が追加していないみたい、、、
+                    <legend>スコアボード</legend>
+                    <div id="scoreBoard"></div>
                 </fieldset>
+                <span>＊ハイスコアで並べるプログラムは明日やります、、、 - Tomo</span>
             </div>
 		</div>
 		<div id="playport" style="display: none;">
@@ -122,14 +127,17 @@
             <h3><strong>達成ボーナス：</strong>+<span id="completePoints"></span></h3><br>
             <h3><strong>タイムボーナス：</strong>+<span id="timeBonus"></span></h3><br><br>
             <h3><strong>合計：</strong><span id="totalPoints"></span>点</h3><br>
-            <input class="textput" placeholder="ニックネームを入力（しなくてもいいよ）"><br>
+            <input id="nicknameP" class="textput" placeholder="ニックネームを入力（しなくてもいいよ）"><br>
             <button class="longEle" onclick="mm()">決定</button>
         </div>
 		<script>
+            //good ol data'vase'
+            var datavase = new Firebase('https://linkit-827fd.firebaseio.com/');
 			//preset of game values
 			var gameMode = "normal";
 			var keyEnabled = false;
             var globalEnd = "end";
+            var pt;
 
 			//element manager
 			var startport = document.getElementById("startport");
@@ -142,6 +150,8 @@
             var majorPoints = document.getElementById("majorPoints");
             var totalPoints = document.getElementById("totalPoints");
             var completePoints = document.getElementById("completePoints");
+            var nicknameP = document.getElementById("nicknameP");
+            var scoreBoard = document.getElementById("scoreBoard");
 
 			function startGame() {
                 playtimer.innerHTML = "10";
@@ -208,12 +218,27 @@
                 timeBonus.innerHTML = timePt;
                 majorPoints.innerHTML = majorPt;
                 var allPt = timePt + majorPt + parseInt(completePoints.innerHTML);
+                pt = allPt;
                 totalPoints.innerHTML = allPt;
             }
             function mm() {
                 startport.style.display = "block";
                 confirmPoint.style.display = "none";
+                if(nicknameP.value.length == 0) {
+                    var nick = "名無しの数学好き";
+                } else {
+                    var nick = nicknameP.value;
+                }
+                alert(nick);
+                datavase.push({username:nick,score:pt});
             }
+            var startListening = function() {
+				datavase.on('child_added', function(snapshot) {
+					var scoreVase = snapshot.val();
+                    scoreBoard.innerHTML = "<strong>" + scoreVase.username + "：</strong>" + scoreVase.score + "<br>" + scoreBoard.innerHTML;
+				});
+			}
+			startListening();
 		</script>
 	</body>
 </html>
