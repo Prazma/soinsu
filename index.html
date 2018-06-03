@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+	<head>
+		<title>素因数分解ゲーム</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<style>
+			body {
+				margin: 0;
+			}
+			h1 {
+				display: inline-block;
+				margin-top: 2px;
+				margin-bottom: 2px;
+				font-family: arial,sans-serif;
+				font-weight: bold;
+			}
+			h2 {
+				display: inline-block;
+				margin-top: 0px;
+				margin-bottom: 0px;
+				font-family: arial,sans-serif;
+				font-weight: bold;
+			}
+			h3 {
+				display: inline-block;
+				margin-top: 2px;
+				margin-bottom: 2px;
+				font-family: arial,sans-serif;
+				font-weight: lighter;
+			}
+			#startport {
+				text-align: center;
+				margin-top: 10px;
+			}
+			button {
+				background-image: -webkit-linear-gradient(top,#f5f5f5,#f1f1f1);
+				background-color: #f2f2f2;
+				border: 1px solid #f2f2f2;
+				border-radius: 2px;
+				color: #757575;
+				cursor: default;
+				font-family: arial,sans-serif;
+				font-size: 13px;
+				font-weight: bold;
+				margin: 11px 4px;
+				min-width: 54px;
+				padding: 0 16px;
+				text-align: center;
+				padding: 6px;
+				box-shadow: 0 1.5px 4px 0 rgba(0,0,0,0.2), 0 0 0 0.5px rgba(0,0,0,0.08);
+				outline: none;
+				width: 100px;
+			}
+			#playport {
+				text-align: center;
+				margin-top: 10px;
+			}
+            .textput {
+                -webkit-appearance: none;
+                display: inline-block;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                border: 1px solid rgba(0,0,0,0.08);
+                border-radius: 2px;
+                font: 16px arial,sans-serif;
+                padding: 5px;
+                box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 0 0 0.25px rgba(0,0,0,0.08);
+                outline: none;
+                font-weight: lighter;
+                width: 310px;
+            }
+            .longEle {
+                width: 310px;
+            }
+            #confirmPoint {
+                text-align: center;
+                margin-top: 10px;
+            }
+            .highscore {
+                width: 90%;
+                max-width: 350px;
+                margin-right: auto;
+                margin-left: auto;
+            }
+		</style>
+	</head>
+	<body>
+		<div id="startport">
+			<h1>素因数高速分解</h1><br>
+			<h3>by 数学を数楽にしMATH</h3>
+			<div class="margedTop">
+				<button onclick="startGame()">スタート！</button>
+				<button onclick="openInstruction()">遊び方</button><br>
+			</div>
+            <div class="highscore">
+                <fieldset>
+                    <legend>ハイスコア</legend>
+                    まだこのゲームの創造者が追加していないみたい、、、
+                </fieldset>
+            </div>
+		</div>
+		<div id="playport" style="display: none;">
+			<h3><strong>タイマー：</strong><span id="playTimer">10</span>秒</h3><br>
+            <h3><strong>得点：</strong><span id="playPoints">0</span>点</h3><br>
+			<h1><span id="numberLarge">00000</span></h1>
+			<div id="mobileKeys">
+				<button onclick="pressKey(2)">2</button>
+				<button onclick="pressKey(3)">3</button><br>
+				<button onclick="pressKey(5)">5</button>
+				<button onclick="pressKey(7)">7</button><br>
+				<button onclick="pressKey(11)">11</button>
+				<button onclick="pressKey(13)">13</button><br>
+				<button onclick="pressKey(17)">17</button>
+				<button onclick="pressKey(19)">19</button><br>
+				<button onclick="pressKey(23)">23</button>
+				<button onclick="pressKey(29)">29</button><br>
+			</div>
+		</div>
+        <div id="confirmPoint" style="display: none;">
+            <h1>今回の得点：</h1><br>
+            <h3><strong>素因数分解：</strong>+<span id="majorPoints"></span></h3><br>
+            <h3><strong>達成ボーナス：</strong>+<span id="completePoints"></span></h3><br>
+            <h3><strong>タイムボーナス：</strong>+<span id="timeBonus"></span></h3><br><br>
+            <h3><strong>合計：</strong><span id="totalPoints"></span>点</h3><br>
+            <input class="textput" placeholder="ニックネームを入力（しなくてもいいよ）"><br>
+            <button class="longEle" onclick="mm()">決定</button>
+        </div>
+		<script>
+			//preset of game values
+			var gameMode = "normal";
+			var keyEnabled = false;
+            var globalEnd = "end";
+
+			//element manager
+			var startport = document.getElementById("startport");
+			var playport = document.getElementById("playport");
+			var numberLarge = document.getElementById("numberLarge");
+			var playtimer = document.getElementById("playTimer");
+            var playpoints = document.getElementById("playPoints");
+            var confirmPoint = document.getElementById("confirmPoint");
+            var timeBonus = document.getElementById("timeBonus");
+            var majorPoints = document.getElementById("majorPoints");
+            var totalPoints = document.getElementById("totalPoints");
+            var completePoints = document.getElementById("completePoints");
+
+
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				gameMode = "mobile";
+			} else {
+				gameMode = "normal";
+			}
+			function startGame() {
+                playtimer.innerHTML = "10";
+                playpoints.innerHTML = "0";
+				startport.style.display = "none";
+				playport.style.display = "block";
+                globalEnd = "not";
+				if(gameMode == "normal") {
+					startMobile();
+				}
+			}
+			function startMobile() {
+				var targetInt = Math.floor((Math.random() * 999) + 100);
+				var checkPrime = isPrime(targetInt);
+				if(checkPrime == false) {
+					numberLarge.innerHTML = targetInt;
+					startTimer();
+					keyEnabled = true;
+				} else {
+                    numberLarge.innerHTML = "720";
+					startTimer();
+					keyEnabled = true;
+                }
+			}
+			function isPrime(num) {
+				for(var i = 2; i < num; i++)
+					if(num % i === 0) return false;
+				return num !== 1;
+			}
+			function startTimer() {
+                var timeCount = 0;
+				var s = setInterval(function(){
+					timeCount += 1;
+					playTimer.innerHTML = parseInt(playTimer.innerHTML)-1;
+					if(timeCount >= 10 || globalEnd == "end") {
+						clearInterval(s);
+                        if( globalEnd != "end" ) {
+                            endPlay();
+                        }
+					}
+				}, 1000);
+			}
+            function pressKey(int) {
+                if(parseInt(numberLarge.innerHTML)%int == 0) {
+                    numberLarge.innerHTML = parseInt(numberLarge.innerHTML)/int;
+                    var primeChecker = isPrime(parseInt(numberLarge.innerHTML));
+                    playpoints.innerHTML = parseInt(playpoints.innerHTML) + (parseInt(playtimer.innerHTML)/10)*5;
+                    if(primeChecker==true){
+                        endPlay();
+                    }
+                } else {
+                    playpoints.innerHTML = parseInt(playpoints.innerHTML) - (parseInt(playtimer.innerHTML)/10)*5;
+                }
+            }
+            function endPlay() {
+                globalEnd = "end";
+                playport.style.display = "none";
+                confirmPoint.style.display = "block";
+                var timePt = parseInt(playtimer.innerHTML)
+                var majorPt = parseInt(playpoints.innerHTML)
+                if(timePt!=0){
+                    completePoints.innerHTML = "20";
+                } else {
+                    completePoints.innerHTML = "なし";
+                }
+                timeBonus.innerHTML = timePt;
+                majorPoints.innerHTML = majorPt;
+                var allPt = timePt + majorPt + parseInt(completePoints.innerHTML);
+                totalPoints.innerHTML = allPt;
+            }
+            function mm() {
+                startport.style.display = "block";
+                confirmPoint.style.display = "none";
+            }
+		</script>
+	</body>
+</html>
