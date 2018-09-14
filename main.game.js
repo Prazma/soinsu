@@ -35,6 +35,7 @@ function startMobile() {
     var ifDint = Math.floor(Math.random() * 4) + 1;
     var targetInt = 1;
     for(i=0;i<10;i++) {
+        ifDint = Math.floor(Math.random() * 4) + 1;
         if(ifDint == 1) {
             targetInt *= 2;
         } else if (ifDint == 2) {
